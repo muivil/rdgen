@@ -1,0 +1,6 @@
+- name: Upload extracted files as artifact
+  uses: actions/upload-artifact@v4
+  with:
+    name: signed-files
+    path: ./SignOutput/
+    retention-days: 30
