@@ -14,7 +14,7 @@ on:
         default: ''
         type: string
       apiServer:
-        description: 'API Server'
+        description: 'API Server1'
         required: true
         default: ''
         type: string
