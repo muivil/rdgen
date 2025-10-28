@@ -1,6 +1,30 @@
-- name: Upload extracted files as artifact
-  uses: actions/upload-artifact@v4
-  with:
-    name: signed-files
-    path: ./SignOutput/
-    retention-days: 30
+name: Extract and Upload Files
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  extract-and-upload:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Extract archive
+      run: |
+        Expand-Archive -Path ./SignOutput/signed_files.zip -DestinationPath ./SignOutput/ -Force
+        
+    - name: List extracted files
+      run: ls -la ./SignOutput/
+      
+    - name: Upload extracted files as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: signed-files
+        path: ./SignOutput/
+        retention-days: 30
