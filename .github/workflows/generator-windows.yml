@@ -661,6 +661,13 @@ jobs:
         continue-on-error: true
         run: |
           mv ./SignOutput/rustdesk.msi "./SignOutput/${{ inputs.filename }}.msi" || echo "rustdesk"
+           
+        -name: Upload build artifact
+        if: ${{ fromJson(inputs.extras).rdgen == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.filename }}
+          path: ./SignOutput/${{ inputs.filename }}.exe
 
       - name: send file to rdgen server
         if: ${{ fromJson(inputs.extras).rdgen == 'true' }}
