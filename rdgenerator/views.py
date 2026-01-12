@@ -15,6 +15,8 @@ from .forms import GenerateForm
 from .models import GithubRun
 from PIL import Image
 from urllib.parse import quote
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
 
 def generator_view(request):
     if request.method == 'POST':
@@ -50,6 +52,9 @@ def generator_view(request):
             compname = form.cleaned_data['compname']
             if not compname:
                 compname = "Purslane Ltd"
+            androidappid = form.cleaned_data['androidappid']
+            if not androidappid:
+                androidappid = "com.carriez.flutter_hbb"
             compname = compname.replace("&","\\&")
             permPass = form.cleaned_data['permanentPassword']
             theme = form.cleaned_data['theme']
@@ -200,6 +205,7 @@ def generator_view(request):
             extras['xOffline'] = 'true' if xOffline else 'false'
             extras['removeNewVersionNotif'] = 'true' if removeNewVersionNotif else 'false'
             extras['compname'] = compname
+            extras['androidappid'] = androidappid
             extra_input = json.dumps(extras)
 
             ####from here run the github action, we need user, repo, access token.
@@ -225,8 +231,6 @@ def generator_view(request):
                     "apiServer":apiServer,
                     "custom":encodedCustom,
                     "uuid":myuuid,
-                    #"iconbase64":iconbase64.decode("utf-8"),
-                    #"logobase64":logobase64.decode("utf-8") if logobase64 else "",
                     "iconlink":iconlink,
                     "logolink":logolink,
                     "appname":appname,
@@ -244,7 +248,7 @@ def generator_view(request):
             create_github_run(myuuid)
             response = requests.post(url, json=data, headers=headers)
             print(response)
-            if response.status_code == 204:
+            if response.status_code == 204 or response.status_code == 200:
                 return render(request, 'waiting.html', {'filename':filename, 'uuid':myuuid, 'status':"Starting generator...please wait", 'platform':platform})
             else:
                 return JsonResponse({"error": "Something went wrong"})
